@@ -2,6 +2,7 @@ package cc;
 
 import cc.CCTextFrame;
 
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,24 +11,18 @@ import java.util.List;
 
 public class CCVideo {
     private final CCVideoSettings settings;
-    private List<CCTextFrame> frames;
+    private DataOutputStream stream;
 
-    public CCVideo(CCVideoSettings settings) {
+    public CCVideo(CCVideoSettings settings, DataOutputStream stream) throws IOException {
         this.settings = settings;
-        this.frames = new LinkedList<>();
+        this.stream = stream;
+        settings.writeContents(stream);
     }
 
-    public void addFrame(CCTextFrame frame) {
+    public void addFrame(CCTextFrame frame) throws IOException {
         if (!settings.equals(frame.getSettings())) {
             throw new IllegalArgumentException("Frame settings must match settings for full video");
         }
-        frames.add(frame);
-    }
-
-    public void writeContents(DataOutputStream stream) throws IOException {
-        settings.writeContents(stream);
-        for (CCTextFrame frame : frames) {
-            frame.writeContents(stream);
-        }
+        frame.writeContents(stream);
     }
 }
